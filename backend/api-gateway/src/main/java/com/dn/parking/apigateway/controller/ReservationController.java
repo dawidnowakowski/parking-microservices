@@ -1,0 +1,30 @@
+package com.dn.parking.apigateway.controller;
+
+import com.dn.parking.apigateway.dto.ReservationDTO;
+import com.dn.parking.apigateway.service.ReservationService;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+
+@RestController
+@RequestMapping("/api")
+public class ReservationController {
+    private final ReservationService reservationService;
+
+    @Autowired
+    public ReservationController(ReservationService reservationService) {
+        this.reservationService = reservationService;
+    }
+
+    @PostMapping("/reservation")
+    public ResponseEntity<String> createReservation(@RequestBody @Valid ReservationDTO reservationDto) {
+        return ResponseEntity.accepted().body(reservationService.createReservation(reservationDto));
+    }
+
+    @GetMapping("/reservation/{id}")
+    public ResponseEntity<ReservationDTO> getReservation(@PathVariable String id) {
+        return ResponseEntity.ok(new ReservationDTO());
+    }
+}

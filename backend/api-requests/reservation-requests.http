@@ -1,0 +1,14 @@
+###
+POST http://localhost:8089/api/reservation
+Content-Type: application/json
+
+{
+  "email": "test@wp.pl",
+  "startDate": "2021-10-17T07:44",
+  "endDate": "2021-10-17T07:44",
+  "parkingSpotId": "U14",
+  "cardNumber": "123-456-789"
+}
+
+###
+GET http://localhost:8080/api/reservation/3
