@@ -25,18 +25,18 @@ services:
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
     ports:
-      - "8081:8080"
+      - "8090:8080"
     environment:
       KAFKA_CLUSTERS_0_NAME: local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
     depends_on:
       - kafka
 
-  api-gateway:
-    build: ./api-gateway
-    ports:
-      - "8080:8080"
-    environment:
-      - KAFKA_BOOTSTRAP_SERVERS=kafka:29092
-    depends_on:
-      - kafka
+#  api-gateway:
+#    build: ./api-gateway
+#    ports:
+#      - "8080:8080"
+#    environment:
+#      - KAFKA_BOOTSTRAP_SERVERS=kafka:29092
+#    depends_on:
+#      - kafka

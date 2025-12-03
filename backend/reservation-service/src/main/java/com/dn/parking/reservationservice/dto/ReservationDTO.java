@@ -1,4 +1,4 @@
-package com.dn.parking.apigateway.dto;
+package com.dn.parking.reservationservice.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
