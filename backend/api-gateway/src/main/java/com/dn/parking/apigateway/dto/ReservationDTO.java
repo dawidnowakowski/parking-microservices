@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
-public class ReservationDTO implements Serializable {
+public class ReservationDTO {
     @NotBlank(message = "missing email")
     @Email(message = "email is not properly formatted")
     private String email;
