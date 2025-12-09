@@ -8,6 +8,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +23,10 @@ public class ReservationService {
 
     @Transactional
     public String createReservation(ReservationDTO reservationDTO) {
+        if (!reservationDTO.getStartDate().isAfter(reservationDTO.getEndDate())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Start date should be after end date");
+        }
+
         Reservation reservation = new Reservation();
         reservation.setStatus(ReservationStatus.PENDING);
         Reservation entity = reservationRepository.save(reservation);

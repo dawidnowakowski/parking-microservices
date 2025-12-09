@@ -5,7 +5,7 @@ Content-Type: application/json
 {
   "email": "test@wp.pl",
   "startDate": "2021-10-17T07:44",
-  "endDate": "2021-10-17T07:44",
+  "endDate": "2021-10-18T07:44",
   "parkingSpotId": "U145",
   "cardNumber": "123-456-789"
 }
