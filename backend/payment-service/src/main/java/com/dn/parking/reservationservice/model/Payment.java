@@ -1,6 +1,8 @@
 package com.dn.parking.reservationservice.model;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,7 @@ public class Payment {
     @Id
     private String paymentId;
 
-    private Long amount;
+    @Enumerated(EnumType.STRING)
     private PaymentStatus status;
+    private Long amount;
 }

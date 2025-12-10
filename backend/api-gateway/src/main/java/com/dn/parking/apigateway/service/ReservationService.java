@@ -22,7 +22,7 @@ public class ReservationService {
 
     @Transactional
     public String createReservation(ReservationDTO reservationDTO) {
-        if (reservationDTO.getStartDate().isAfter(reservationDTO.getEndDate())) {
+        if (!reservationDTO.getEndDate().isAfter(reservationDTO.getStartDate())) {
             throw new InvalidReservationDateException("Start date must be before the end date");
         }
 
