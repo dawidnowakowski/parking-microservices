@@ -4,14 +4,11 @@ Content-Type: application/json
 
 {
   "email": "test@wp.pl",
-  "startDate": "2021-10-17T07:44",
-  "endDate": "2021-10-17T07:44",
+  "startDate": "2026-10-18T07:43",
+  "endDate": "2026-10-18T07:44",
   "parkingSpotId": "U145",
   "cardNumber": "123-456-789"
 }
 
 ###
 GET http://localhost:8080/api/reservation/3
-
-###
-GET http://localhost:8081/api/reservation/3

@@ -1,6 +1,7 @@
 package com.dn.parking.apigateway.service;
 
 import com.dn.parking.apigateway.dto.ReservationDTO;
+import com.dn.parking.apigateway.exception.InvalidReservationDateException;
 import com.dn.parking.apigateway.model.Reservation;
 import com.dn.parking.apigateway.model.ReservationStatus;
 import com.dn.parking.apigateway.repository.ReservationRepository;
@@ -21,6 +22,10 @@ public class ReservationService {
 
     @Transactional
     public String createReservation(ReservationDTO reservationDTO) {
+        if (!reservationDTO.getEndDate().isAfter(reservationDTO.getStartDate())) {
+            throw new InvalidReservationDateException("Start date must be before the end date");
+        }
+
         Reservation reservation = new Reservation();
         reservation.setStatus(ReservationStatus.PENDING);
         Reservation entity = reservationRepository.save(reservation);

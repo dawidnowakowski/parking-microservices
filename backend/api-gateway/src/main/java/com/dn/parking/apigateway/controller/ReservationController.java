@@ -20,7 +20,8 @@ public class ReservationController {
 
     @PostMapping("/reservation")
     public ResponseEntity<String> createReservation(@RequestBody @Valid ReservationDTO reservationDto) {
-        return ResponseEntity.accepted().body(reservationService.createReservation(reservationDto));
+        String reservationId = reservationService.createReservation(reservationDto);
+        return ResponseEntity.accepted().body(reservationId);
     }
 
     @GetMapping("/reservation/{id}")
