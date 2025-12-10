@@ -1,6 +1,7 @@
 package com.dn.parking.apigateway.service;
 
 import com.dn.parking.apigateway.dto.ReservationDTO;
+import com.dn.parking.apigateway.exception.InvalidReservationDateException;
 import com.dn.parking.apigateway.model.Reservation;
 import com.dn.parking.apigateway.model.ReservationStatus;
 import com.dn.parking.apigateway.repository.ReservationRepository;
@@ -8,8 +9,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -23,8 +22,8 @@ public class ReservationService {
 
     @Transactional
     public String createReservation(ReservationDTO reservationDTO) {
-        if (!reservationDTO.getStartDate().isAfter(reservationDTO.getEndDate())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Start date should be after end date");
+        if (reservationDTO.getStartDate().isAfter(reservationDTO.getEndDate())) {
+            throw new InvalidReservationDateException("Start date must be before the end date");
         }
 
         Reservation reservation = new Reservation();
