@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:soapui-project id="bdbe3a9d-2d4b-4f57-bbd2-c6c7d9b61009" activeEnvironment="Default" name="Payment" resourceRoot="" soapui-version="5.9.1" xmlns:con="http://eviware.com/soapui/config"><con:settings/><con:interface xsi:type="con:WsdlInterface" id="7ac1810a-13f6-4d53-96c1-cf2d63118156" wsaVersion="NONE" name="PaymentServiceSoapBinding" type="wsdl" bindingName="{http://paymentsoapservice.lab/}PaymentServiceSoapBinding" soapVersion="1_1" anonymous="optional" definition="http://localhost:8083/soap-api/service/payment?wsdl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="http://localhost:8083/soap-api/service/payment?wsdl"><con:part><con:url>http://localhost:8083/soap-api/service/payment?wsdl</con:url><con:content><![CDATA[<wsdl:definitions name="PaymentService" targetNamespace="http://paymentsoapservice.lab/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://paymentsoapservice.lab/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http">
+  <wsdl:types>
+    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://paymentsoapservice.lab/" version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:element name="processPayment" type="tns:processPayment"/>
+      <xs:element name="processPaymentResponse" type="tns:processPaymentResponse"/>
+      <xs:complexType name="processPayment">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="arg0" type="tns:paymentRequest"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="paymentRequest">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="amount" type="xs:double"/>
+          <xs:element minOccurs="0" name="cardNumber" type="xs:string"/>
+          <xs:element minOccurs="0" name="cvv" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="processPaymentResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="return" type="tns:paymentResponse"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="paymentResponse">
+        <xs:sequence>
+          <xs:element name="approved" type="xs:boolean"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:element name="PaymentFault" type="tns:PaymentFault"/>
+      <xs:complexType name="PaymentFault">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="code" type="xs:int"/>
+          <xs:element minOccurs="0" name="text" type="xs:string"/>
+          <xs:element minOccurs="0" name="message" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="PaymentFault">
+    <wsdl:part element="tns:PaymentFault" name="PaymentFault"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="processPayment">
+    <wsdl:part element="tns:processPayment" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="processPaymentResponse">
+    <wsdl:part element="tns:processPaymentResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="PaymentService">
+    <wsdl:operation name="processPayment">
+      <wsdl:input message="tns:processPayment" name="processPayment"></wsdl:input>
+      <wsdl:output message="tns:processPaymentResponse" name="processPaymentResponse"></wsdl:output>
+      <wsdl:fault message="tns:PaymentFault" name="PaymentFault"></wsdl:fault>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="PaymentServiceSoapBinding" type="tns:PaymentService">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="processPayment">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="processPayment">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="processPaymentResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="PaymentFault">
+        <soap:fault name="PaymentFault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="PaymentService">
+    <wsdl:port binding="tns:PaymentServiceSoapBinding" name="PaymentServicePort">
+      <soap:address location="http://localhost:8083/soap-api/service/payment"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>http://localhost:8083/soap-api/service/payment</con:endpoint></con:endpoints><con:operation id="a25c6aad-c536-457d-b769-62298ce1e416" isOneWay="false" action="" name="processPayment" bindingOperationName="processPayment" type="Request-Response" outputName="processPaymentResponse" inputName="processPayment" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="1019b831-b966-4539-9cc8-f059c5cc626d" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8083/soap-api/service/payment</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:pay="http://paymentsoapservice.lab/">\r
+   <soapenv:Header/>\r
+   <soapenv:Body>\r
+      <pay:processPayment>\r
+         <!--Optional:-->\r
+         <arg0>\r
+            <!--Optional:-->\r
+            <amount>3.2</amount>\r
+            <!--Optional:-->\r
+            <cardNumber>2123</cardNumber>\r
+            <!--Optional:-->\r
+            <cvv>?</cvv>\r
+         </arg0>\r
+      </pay:processPayment>\r
+   </soapenv:Body>\r
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://paymentsoapservice.lab/PaymentService/processPayment"/><con:wsrmConfig version="1.2"/></con:call></con:operation></con:interface><con:properties/><con:wssContainer/><con:oAuth2ProfileContainer/><con:oAuth1ProfileContainer/></con:soapui-project>
