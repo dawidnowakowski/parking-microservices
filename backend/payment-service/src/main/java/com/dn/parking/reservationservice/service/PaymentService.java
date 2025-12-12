@@ -18,7 +18,9 @@ public class PaymentService {
         return paymentRepository.save(payment);
     }
 
-    public long calculateAmount(LocalDateTime startDate, LocalDateTime endDate) {
-        return Math.round(Duration.between(startDate, endDate).toMinutes() / 60.0) * 6;
+    public Double calculateAmount(LocalDateTime startDate, LocalDateTime endDate) {
+        long millis = Duration.between(startDate, endDate).toMillis();
+        double hours = Math.ceil(millis / 3_600_000.0);
+        return Math.max(6.0, hours * 6.0);
     }
 }

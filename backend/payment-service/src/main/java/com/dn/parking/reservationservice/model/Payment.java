@@ -18,7 +18,10 @@ public class Payment {
     @Id
     private String paymentId;
 
+    private String cardNumber;
+
     @Enumerated(EnumType.STRING)
     private PaymentStatus status;
-    private Long amount;
+
+    private Double amount;
 }
