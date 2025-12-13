@@ -1,4 +1,4 @@
-package com.dn.parking.reservationservice.kafka;
+package com.dn.parking.paymentservice.kafka;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

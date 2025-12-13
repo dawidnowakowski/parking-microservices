@@ -1,4 +1,4 @@
-package com.dn.parking.reservationservice;
+package com.dn.parking.paymentservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

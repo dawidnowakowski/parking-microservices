@@ -1,7 +1,7 @@
-package com.dn.parking.reservationservice.service;
+package com.dn.parking.paymentservice.service;
 
-import com.dn.parking.reservationservice.model.Payment;
-import com.dn.parking.reservationservice.repository.PaymentRepository;
+import com.dn.parking.paymentservice.model.Payment;
+import com.dn.parking.paymentservice.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

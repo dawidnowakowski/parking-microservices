@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import org.hibernate.validator.constraints.Range;
 
 import java.time.LocalDateTime;
 
@@ -25,6 +26,10 @@ public class ReservationDTO {
     @NotBlank(message = "parkingSpotId is missing")
     private String parkingSpotId;
 
-    @NotBlank(message = "cardNumber")
+    @NotBlank(message = "cardNumber is empty")
     private String cardNumber;
+
+    @NotNull(message = "cvv is missing")
+    @Range(message = "cvv must be in range 100-999", min = 100, max = 999)
+    private Integer cvv;
 }

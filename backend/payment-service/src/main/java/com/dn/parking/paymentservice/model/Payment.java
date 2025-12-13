@@ -1,4 +1,4 @@
-package com.dn.parking.reservationservice.model;
+package com.dn.parking.paymentservice.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

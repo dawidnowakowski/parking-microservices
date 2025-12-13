@@ -7,7 +7,8 @@ Content-Type: application/json
   "startDate": "2026-10-18T07:43",
   "endDate": "2026-10-18T07:44",
   "parkingSpotId": "U145",
-  "cardNumber": "123-456-789"
+  "cardNumber": "123-456-789",
+  "cvv": 100
 }
 
 ###

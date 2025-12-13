@@ -1,4 +1,4 @@
-package com.dn.parking.reservationservice.model;
+package com.dn.parking.paymentservice.model;
 
 public enum PaymentStatus {
     PENDING,

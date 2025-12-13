@@ -1,10 +1,10 @@
-package com.dn.parking.reservationservice.kafka;
+package com.dn.parking.paymentservice.kafka;
 
 
-import com.dn.parking.reservationservice.dto.ReservationDTO;
-import com.dn.parking.reservationservice.model.Payment;
-import com.dn.parking.reservationservice.model.PaymentStatus;
-import com.dn.parking.reservationservice.service.PaymentService;
+import com.dn.parking.paymentservice.dto.ReservationDTO;
+import com.dn.parking.paymentservice.model.Payment;
+import com.dn.parking.paymentservice.model.PaymentStatus;
+import com.dn.parking.paymentservice.service.PaymentService;
 import lab.paymentsoapservice.PaymentFault_Exception;
 import lab.paymentsoapservice.PaymentRequest;
 import lab.paymentsoapservice.PaymentResponse;

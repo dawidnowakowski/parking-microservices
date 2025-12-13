@@ -1,4 +1,4 @@
-package com.dn.parking.reservationservice.dto;
+package com.dn.parking.paymentservice.dto;
 
 import lombok.Data;
 
@@ -10,4 +10,5 @@ public class ReservationDTO {
     private LocalDateTime startDate;
     private LocalDateTime endDate;
     private String cardNumber;
+    private Integer cvv;
 }
