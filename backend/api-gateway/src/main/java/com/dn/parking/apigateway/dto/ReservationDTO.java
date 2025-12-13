@@ -1,9 +1,6 @@
 package com.dn.parking.apigateway.dto;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Future;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 
@@ -22,6 +19,10 @@ public class ReservationDTO {
     @Future(message = "endDate must be in the future")
     @NotNull(message = "endDate is missing")
     private LocalDateTime endDate;
+
+    @NotNull(message = "registrationNumber is missing")
+    @Size(message = "registrationNumber must be 4 to 8 characters long")
+    private String registrationNumber;
 
     @NotBlank(message = "parkingSpotId is missing")
     private String parkingSpotId;

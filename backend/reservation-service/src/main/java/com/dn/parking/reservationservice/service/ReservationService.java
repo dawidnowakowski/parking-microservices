@@ -1,16 +1,85 @@
 package com.dn.parking.reservationservice.service;
 
 import com.dn.parking.reservationservice.model.Reservation;
+import com.dn.parking.reservationservice.model.ReservationStatus;
 import com.dn.parking.reservationservice.repository.ReservationRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.KafkaHeaders;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class ReservationService {
-    private final ReservationRepository reservationRepository;
+    private final String TOPIC_STATUS = "status-updates";
+    private final String TOPIC_SAGA = "saga-alert";
 
+    Logger logger = LoggerFactory.getLogger(ReservationService.class);
+    private final ReservationRepository reservationRepository;
+    private final KafkaTemplate<String, String> kafkaTemplate;
+
+    @Transactional
     public void save(Reservation reservation) {
-        reservationRepository.save(reservation);
+        boolean isTaken = reservationRepository.existsOverlappingReservation(
+                reservation.getParkingSpotId(),
+                reservation.getStartDate(),
+                reservation.getEndDate()
+        );
+
+        if (isTaken) {
+            reservation.setStatus(ReservationStatus.CANCELLED);
+            reservationRepository.save(reservation);
+
+            logger.info("ReservationId: {} cancelled - spot is taken", reservation.getReservationId());
+
+            Message<String> errorMsg = MessageBuilder
+                    .withPayload("Parking spot already taken")
+                    .setHeader(KafkaHeaders.TOPIC, TOPIC_STATUS)
+                    .setHeader(KafkaHeaders.KEY, reservation.getReservationId())
+                    .setHeader("event-type", "error")
+                    .build();
+            kafkaTemplate.send(errorMsg);
+
+            Message<String> sagaMsg = MessageBuilder
+                    .withPayload("")
+                    .setHeader(KafkaHeaders.TOPIC, TOPIC_SAGA)
+                    .setHeader(KafkaHeaders.KEY, reservation.getReservationId())
+                    .setHeader("source", "RESERVATION")
+                    .build();
+            kafkaTemplate.send(sagaMsg);
+        } else {
+            reservationRepository.save(reservation);
+
+            logger.info("ReservationId: {} successful - spot is now reserved", reservation.getReservationId());
+
+            Message<String> successMsg = MessageBuilder
+                    .withPayload("Successfully reserved parking spot")
+                    .setHeader(KafkaHeaders.TOPIC, TOPIC_STATUS)
+                    .setHeader(KafkaHeaders.KEY, reservation.getReservationId())
+                    .setHeader("event-type", "update")
+                    .build();
+            kafkaTemplate.send(successMsg);
+        }
+    }
+
+
+    public void handleSaga(String source, String key) {
+        if (!source.equals("RESERVATION")) {
+            reservationRepository.findById(key).ifPresentOrElse(
+                    reservation -> reservation.setStatus(ReservationStatus.CANCELLED),
+                    () -> {
+                        Reservation reservation = new Reservation();
+                        reservation.setReservationId(key);
+                        reservation.setStatus(ReservationStatus.CANCELLED);
+                        reservationRepository.save(reservation);
+                    }
+            );
+        }
+
     }
 }
