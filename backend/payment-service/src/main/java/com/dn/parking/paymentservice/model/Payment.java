@@ -1,9 +1,6 @@
 package com.dn.parking.paymentservice.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -26,4 +23,7 @@ public class Payment {
     private Double amount;
 
     private Integer cvv;
+
+    @Version
+    private Long version;
 }

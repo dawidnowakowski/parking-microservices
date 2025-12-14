@@ -2,9 +2,7 @@ package lab.paymentsoapservice;
 
 import jakarta.jws.WebMethod;
 import jakarta.jws.WebService;
-import lab.types.PaymentFault;
-import lab.types.PaymentRequest;
-import lab.types.PaymentResponse;
+import lab.types.*;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -22,6 +20,13 @@ public class PaymentService {
 
         PaymentResponse response = new PaymentResponse();
         response.setApproved(true);
+        return response;
+    }
+
+    @WebMethod
+    public RefundResponse processRefund(RefundRequest request) {
+        RefundResponse response = new RefundResponse();
+        response.setSuccess(true);
         return response;
     }
 }

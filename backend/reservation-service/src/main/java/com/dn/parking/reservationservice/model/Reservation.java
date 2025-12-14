@@ -1,9 +1,6 @@
 package com.dn.parking.reservationservice.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -26,4 +23,7 @@ public class Reservation {
 
     @Enumerated(EnumType.STRING)
     private ReservationStatus status;
+
+    @Version
+    private Long version;
 }
