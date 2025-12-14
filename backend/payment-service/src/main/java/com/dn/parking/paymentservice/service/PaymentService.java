@@ -1,26 +1,141 @@
 package com.dn.parking.paymentservice.service;
 
 import com.dn.parking.paymentservice.model.Payment;
+import com.dn.parking.paymentservice.model.PaymentStatus;
 import com.dn.parking.paymentservice.repository.PaymentRepository;
+import lab.paymentsoapservice.PaymentFault_Exception;
+import lab.paymentsoapservice.PaymentRequest;
+import lab.paymentsoapservice.PaymentResponse;
+import lab.paymentsoapservice.PaymentService_Service;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.KafkaHeaders;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 
+import javax.xml.namespace.QName;
+import java.net.URL;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class PaymentService {
-    final PaymentRepository paymentRepository;
+    private final String TOPIC_STATUS = "status-updates";
+    private final String TOPIC_SAGA = "saga-alert";
+    private final KafkaTemplate<String, String> kafkaTemplate;
 
+    private static final QName SERVICE_NAME = new QName("http://paymentsoapservice.lab/", "PaymentService");
+    Logger logger = LoggerFactory.getLogger(PaymentService.class);
 
-    public Payment save(Payment payment) {
-        return paymentRepository.save(payment);
-    }
+    private final PaymentRepository paymentRepository;
 
     public Double calculateAmount(LocalDateTime startDate, LocalDateTime endDate) {
         long millis = Duration.between(startDate, endDate).toMillis();
         double hours = Math.ceil(millis / 3_600_000.0);
         return Math.max(6.0, hours * 6.0);
+    }
+
+    public void sendPaymentRequest(Payment payment) {
+        try {
+            paymentRepository.save(payment);
+        } catch (Exception e) {
+            // if an exception is thrown by JPA it means that the record already exists - which is only true if the record was created by Saga
+            return;
+        }
+//
+//        try {
+//            Thread.sleep(30000);
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        }
+
+        URL wsdlURL = PaymentService_Service.WSDL_LOCATION;
+
+        PaymentService_Service ss = new PaymentService_Service(wsdlURL, SERVICE_NAME);
+        lab.paymentsoapservice.PaymentService port = ss.getPaymentServicePort();
+
+        PaymentRequest soapRequest = new PaymentRequest();
+        soapRequest.setAmount(payment.getAmount());
+        soapRequest.setCardNumber(payment.getCardNumber());
+        soapRequest.setCvv(payment.getCvv().toString());
+
+        try {
+            PaymentResponse soapResponse = port.processPayment(soapRequest);
+            if (soapResponse.isApproved()) {
+                // check if operation was not cancelled during request
+                Optional<Payment> paymentOpt = paymentRepository.findById(payment.getPaymentId());
+                if (paymentOpt.isPresent() && paymentOpt.get().getStatus().equals(PaymentStatus.CANCELLED)) {
+                    sendRefundRequest(payment);
+                    return;
+                }
+
+                payment.setStatus(PaymentStatus.CONFIRMED);
+                paymentRepository.save(payment);
+                logger.info("Payment Approved for ID: {}", payment.getPaymentId());
+
+                Message<String> successMsg = MessageBuilder
+                        .withPayload("Payment approved")
+                        .setHeader(KafkaHeaders.TOPIC, TOPIC_STATUS)
+                        .setHeader(KafkaHeaders.KEY, payment.getPaymentId())
+                        .setHeader("source", "PAYMENT")
+                        .setHeader("event-type", "0")
+                        .build();
+                kafkaTemplate.send(successMsg);
+            }
+        } catch (PaymentFault_Exception e) {
+            payment.setStatus(PaymentStatus.CANCELLED);
+            paymentRepository.save(payment);
+            logger.error("SOAP Service returned a fault: {}", e.getFaultInfo().getMessage());
+
+            Message<String> errorMsg = MessageBuilder
+                    .withPayload("Payment rejected by bank")
+                    .setHeader(KafkaHeaders.TOPIC, TOPIC_STATUS)
+                    .setHeader(KafkaHeaders.KEY, payment.getPaymentId())
+                    .setHeader("source", "PAYMENT")
+                    .setHeader("event-type", "1")
+                    .build();
+            kafkaTemplate.send(errorMsg);
+
+            Message<String> sagaMsg = MessageBuilder
+                    .withPayload("")
+                    .setHeader(KafkaHeaders.TOPIC, TOPIC_SAGA)
+                    .setHeader(KafkaHeaders.KEY, payment.getPaymentId())
+                    .setHeader("source", "PAYMENT")
+                    .build();
+            kafkaTemplate.send(sagaMsg);
+
+            sendRefundRequest(payment);
+        }
+    }
+
+    public void handleSaga(String source, String key) {
+        if (!source.equals("PAYMENT")) {
+            Optional<Payment> paymentOpt = paymentRepository.findById(key);
+
+            if (paymentOpt.isPresent()) {
+                if (paymentOpt.get().getStatus().equals(PaymentStatus.CONFIRMED)) {
+                    paymentOpt.get().setStatus(PaymentStatus.CANCELLED);
+                    paymentRepository.save(paymentOpt.get());
+                    sendRefundRequest(paymentOpt.get());
+                } else if (paymentOpt.get().getStatus().equals(PaymentStatus.PENDING)) {
+                    paymentOpt.get().setStatus(PaymentStatus.CANCELLED);
+                    paymentRepository.save(paymentOpt.get());
+                } // another else-if would be CANCELLED but in this case we don't have to change anything
+            } else {
+                Payment payment = new Payment();
+                payment.setPaymentId(key);
+                payment.setStatus(PaymentStatus.CANCELLED);
+                paymentRepository.save(payment);
+            }
+        }
+    }
+
+    public void sendRefundRequest(Payment payment) {
+        logger.info("Sending Refund Request for transaction {}", payment.getPaymentId());
     }
 }

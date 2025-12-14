@@ -24,4 +24,6 @@ public class Payment {
     private PaymentStatus status;
 
     private Double amount;
+
+    private Integer cvv;
 }

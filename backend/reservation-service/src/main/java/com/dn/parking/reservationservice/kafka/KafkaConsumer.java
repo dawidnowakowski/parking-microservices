@@ -35,7 +35,6 @@ public class KafkaConsumer {
     public void processSagaMessage(
             @Header("source") String source,
             @Header(KafkaHeaders.RECEIVED_KEY) String key) {
-        System.out.println(String.join(source, key));
         reservationService.handleSaga(source, key);
     }
 }
