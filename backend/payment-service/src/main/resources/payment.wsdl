@@ -3,6 +3,8 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://paymentsoapservice.lab/" attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://paymentsoapservice.lab/" version="1.0">
   <xs:element name="processPayment" type="tns:processPayment"/>
   <xs:element name="processPaymentResponse" type="tns:processPaymentResponse"/>
+  <xs:element name="processRefund" type="tns:processRefund"/>
+  <xs:element name="processRefundResponse" type="tns:processRefundResponse"/>
   <xs:complexType name="processPayment">
     <xs:sequence>
       <xs:element minOccurs="0" name="arg0" type="tns:paymentRequest"/>
@@ -25,6 +27,26 @@
       <xs:element name="approved" type="xs:boolean"/>
     </xs:sequence>
   </xs:complexType>
+  <xs:complexType name="processRefund">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="arg0" type="tns:refundRequest"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="refundRequest">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="transactionId" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="processRefundResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:refundResponse"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="refundResponse">
+    <xs:sequence>
+      <xs:element name="success" type="xs:boolean"/>
+    </xs:sequence>
+  </xs:complexType>
   <xs:element name="PaymentFault" type="tns:PaymentFault"/>
   <xs:complexType name="PaymentFault">
     <xs:sequence>
@@ -43,8 +65,16 @@
     <wsdl:part element="tns:processPayment" name="parameters">
     </wsdl:part>
   </wsdl:message>
+  <wsdl:message name="processRefund">
+    <wsdl:part element="tns:processRefund" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
   <wsdl:message name="processPaymentResponse">
     <wsdl:part element="tns:processPaymentResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="processRefundResponse">
+    <wsdl:part element="tns:processRefundResponse" name="parameters">
     </wsdl:part>
   </wsdl:message>
   <wsdl:portType name="PaymentService">
@@ -55,6 +85,12 @@
     </wsdl:output>
       <wsdl:fault message="tns:PaymentFault" name="PaymentFault">
     </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="processRefund">
+      <wsdl:input message="tns:processRefund" name="processRefund">
+    </wsdl:input>
+      <wsdl:output message="tns:processRefundResponse" name="processRefundResponse">
+    </wsdl:output>
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="PaymentServiceSoapBinding" type="tns:PaymentService">
@@ -70,6 +106,15 @@
       <wsdl:fault name="PaymentFault">
         <soap:fault name="PaymentFault" use="literal"/>
       </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="processRefund">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="processRefund">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="processRefundResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
     </wsdl:operation>
   </wsdl:binding>
   <wsdl:service name="PaymentService">

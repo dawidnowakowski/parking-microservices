@@ -3,12 +3,12 @@ POST http://localhost:8080/api/reservation
 Content-Type: application/json
 
 {
-  "email": "test@wp.pl",
+  "email": "test@test.com",
   "startDate": "2026-10-18T07:43",
   "endDate": "2026-10-18T07:44",
-  "registrationNumber": "CBY1234",
-  "parkingSpotId": "U146",
-  "cardNumber": "123-456-789",
+  "registrationNumber": "CBY12345",
+  "parkingSpotId": "U14234",
+  "cardNumber": "2123-456-789",
   "cvv": 100
 }
 

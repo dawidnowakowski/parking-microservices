@@ -3,10 +3,7 @@ package com.dn.parking.paymentservice.service;
 import com.dn.parking.paymentservice.model.Payment;
 import com.dn.parking.paymentservice.model.PaymentStatus;
 import com.dn.parking.paymentservice.repository.PaymentRepository;
-import lab.paymentsoapservice.PaymentFault_Exception;
-import lab.paymentsoapservice.PaymentRequest;
-import lab.paymentsoapservice.PaymentResponse;
-import lab.paymentsoapservice.PaymentService_Service;
+import lab.paymentsoapservice.*;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,6 +100,7 @@ public class PaymentService {
     }
 
     public void handleSaga(String source, String key) {
+        logger.info("Received Saga for key: {}", key);
         if (!source.equals("PAYMENT")) {
             Optional<Payment> paymentOpt = paymentRepository.findById(key);
 
@@ -130,5 +128,24 @@ public class PaymentService {
 
     public void sendRefundRequest(Payment payment) {
         logger.info("Sending Refund Request for transaction {}", payment.getPaymentId());
+        URL wsdlURL = PaymentService_Service.WSDL_LOCATION;
+
+        PaymentService_Service ss = new PaymentService_Service(wsdlURL, SERVICE_NAME);
+        lab.paymentsoapservice.PaymentService port = ss.getPaymentServicePort();
+
+        RefundRequest soapRequest = new RefundRequest();
+        soapRequest.setTransactionId(payment.getPaymentId());
+
+        try {
+            RefundResponse soapResponse = port.processRefund(soapRequest);
+            logger.info("Refund Response for transaction {}", payment.getPaymentId());
+            if (soapResponse.isSuccess()) {
+                payment.setStatus(PaymentStatus.REFUNDED);
+                paymentRepository.save(payment);
+            }
+        } catch (Exception e) {
+            payment.setStatus(PaymentStatus.REFUND_ERROR);
+            paymentRepository.save(payment);
+        }
     }
 }

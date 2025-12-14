@@ -26,6 +26,8 @@ public class ObjectFactory {
 
     private final static QName _ProcessPayment_QNAME = new QName("http://paymentsoapservice.lab/", "processPayment");
     private final static QName _ProcessPaymentResponse_QNAME = new QName("http://paymentsoapservice.lab/", "processPaymentResponse");
+    private final static QName _ProcessRefund_QNAME = new QName("http://paymentsoapservice.lab/", "processRefund");
+    private final static QName _ProcessRefundResponse_QNAME = new QName("http://paymentsoapservice.lab/", "processRefundResponse");
     private final static QName _PaymentFault_QNAME = new QName("http://paymentsoapservice.lab/", "PaymentFault");
 
     /**
@@ -49,6 +51,22 @@ public class ObjectFactory {
      */
     public ProcessPaymentResponse createProcessPaymentResponse() {
         return new ProcessPaymentResponse();
+    }
+
+    /**
+     * Create an instance of {@link ProcessRefund }
+     * 
+     */
+    public ProcessRefund createProcessRefund() {
+        return new ProcessRefund();
+    }
+
+    /**
+     * Create an instance of {@link ProcessRefundResponse }
+     * 
+     */
+    public ProcessRefundResponse createProcessRefundResponse() {
+        return new ProcessRefundResponse();
     }
 
     /**
@@ -76,6 +94,22 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link RefundRequest }
+     * 
+     */
+    public RefundRequest createRefundRequest() {
+        return new RefundRequest();
+    }
+
+    /**
+     * Create an instance of {@link RefundResponse }
+     * 
+     */
+    public RefundResponse createRefundResponse() {
+        return new RefundResponse();
+    }
+
+    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link ProcessPayment }{@code >}
      * 
      * @param value
@@ -99,6 +133,32 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "http://paymentsoapservice.lab/", name = "processPaymentResponse")
     public JAXBElement<ProcessPaymentResponse> createProcessPaymentResponse(ProcessPaymentResponse value) {
         return new JAXBElement<ProcessPaymentResponse>(_ProcessPaymentResponse_QNAME, ProcessPaymentResponse.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link ProcessRefund }{@code >}
+     * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link ProcessRefund }{@code >}
+     */
+    @XmlElementDecl(namespace = "http://paymentsoapservice.lab/", name = "processRefund")
+    public JAXBElement<ProcessRefund> createProcessRefund(ProcessRefund value) {
+        return new JAXBElement<ProcessRefund>(_ProcessRefund_QNAME, ProcessRefund.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link ProcessRefundResponse }{@code >}
+     * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link ProcessRefundResponse }{@code >}
+     */
+    @XmlElementDecl(namespace = "http://paymentsoapservice.lab/", name = "processRefundResponse")
+    public JAXBElement<ProcessRefundResponse> createProcessRefundResponse(ProcessRefundResponse value) {
+        return new JAXBElement<ProcessRefundResponse>(_ProcessRefundResponse_QNAME, ProcessRefundResponse.class, null, value);
     }
 
     /**

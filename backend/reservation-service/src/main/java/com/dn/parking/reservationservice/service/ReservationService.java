@@ -34,7 +34,11 @@ public class ReservationService {
 
         if (isTaken) {
             reservation.setStatus(ReservationStatus.CANCELLED);
-            reservationRepository.save(reservation);
+            try {
+                reservationRepository.save(reservation);
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            }
 
             logger.info("ReservationId: {} cancelled - spot is taken", reservation.getReservationId());
 
@@ -56,7 +60,11 @@ public class ReservationService {
             kafkaTemplate.send(sagaMsg);
         } else {
             reservation.setStatus(ReservationStatus.RESERVED);
-            reservationRepository.save(reservation);
+            try {
+                reservationRepository.save(reservation);
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            }
 
             logger.info("ReservationId: {} successful - spot is now reserved", reservation.getReservationId());
 
