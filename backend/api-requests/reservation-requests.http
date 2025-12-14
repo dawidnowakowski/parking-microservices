@@ -6,7 +6,8 @@ Content-Type: application/json
   "email": "test@wp.pl",
   "startDate": "2026-10-18T07:43",
   "endDate": "2026-10-18T07:44",
-  "parkingSpotId": "U145",
+  "registrationNumber": "CBY1234",
+  "parkingSpotId": "U146",
   "cardNumber": "123-456-789",
   "cvv": 100
 }

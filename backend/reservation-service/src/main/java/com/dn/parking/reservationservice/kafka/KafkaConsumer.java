@@ -16,17 +16,25 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class KafkaConsumer {
-    private static final String TOPIC_NAME = "reservation-requests";
+    private static final String TOPIC_REQUESTS = "reservation-requests";
+    private final String TOPIC_SAGA = "saga-alert";
     private final ReservationService reservationService;
     Logger logger = LoggerFactory.getLogger(KafkaConsumer.class);
 
-    @KafkaListener(topics = TOPIC_NAME)
+    @KafkaListener(topics = TOPIC_REQUESTS)
     public void processMessage(
             @Payload Reservation message,
             @Header(KafkaHeaders.RECEIVED_KEY) String key) {
-        logger.info("Reservation request received from Kafka topic: {} with key: {}", TOPIC_NAME, key);
+        logger.info("Reservation request received from Kafka topic: {} with key: {}", TOPIC_REQUESTS, key);
         message.setReservationId(key);
-        message.setStatus(ReservationStatus.PENDING);
+        message.setStatus(ReservationStatus.IN_PROGRESS);
         reservationService.save(message);
+    }
+
+    @KafkaListener(topics = TOPIC_SAGA)
+    public void processSagaMessage(
+            @Header("source") String source,
+            @Header(KafkaHeaders.RECEIVED_KEY) String key) {
+        reservationService.handleSaga(source, key);
     }
 }

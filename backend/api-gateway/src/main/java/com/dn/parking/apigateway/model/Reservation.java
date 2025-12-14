@@ -16,4 +16,7 @@ public class Reservation {
 
     @Enumerated(EnumType.STRING)
     private ReservationStatus status;
+
+    String updateMessages;
+    String errorMessages;
 }
