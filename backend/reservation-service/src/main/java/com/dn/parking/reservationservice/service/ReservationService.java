@@ -25,13 +25,6 @@ public class ReservationService {
 
     @Transactional
     public void save(Reservation reservation) {
-        try {
-            reservationRepository.save(reservation);
-        } catch (Exception e) {
-            // if an exception is thrown by JPA it means that the record already exists - which is only true if the record was created by Saga
-            return;
-        }
-
         boolean isTaken = reservationRepository.existsOverlappingReservation(
                 reservation.getReservationId(),
                 reservation.getParkingSpotId(),
@@ -87,7 +80,11 @@ public class ReservationService {
                         Reservation reservation = new Reservation();
                         reservation.setReservationId(key);
                         reservation.setStatus(ReservationStatus.CANCELLED);
-                        reservationRepository.save(reservation);
+                        try {
+                            reservationRepository.save(reservation);
+                        } catch (Exception e) {
+                            handleSaga(source, key); // should only repeat once if save method execution has ended in the meanwhile
+                        }
                     }
             );
         }

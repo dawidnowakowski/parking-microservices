@@ -41,19 +41,6 @@ public class PaymentService {
     }
 
     public void sendPaymentRequest(Payment payment) {
-        try {
-            paymentRepository.save(payment);
-        } catch (Exception e) {
-            // if an exception is thrown by JPA it means that the record already exists - which is only true if the record was created by Saga
-            return;
-        }
-//
-//        try {
-//            Thread.sleep(30000);
-//        } catch (InterruptedException e) {
-//            throw new RuntimeException(e);
-//        }
-
         URL wsdlURL = PaymentService_Service.WSDL_LOCATION;
 
         PaymentService_Service ss = new PaymentService_Service(wsdlURL, SERVICE_NAME);
@@ -67,15 +54,13 @@ public class PaymentService {
         try {
             PaymentResponse soapResponse = port.processPayment(soapRequest);
             if (soapResponse.isApproved()) {
-                // check if operation was not cancelled during request
-                Optional<Payment> paymentOpt = paymentRepository.findById(payment.getPaymentId());
-                if (paymentOpt.isPresent() && paymentOpt.get().getStatus().equals(PaymentStatus.CANCELLED)) {
+                payment.setStatus(PaymentStatus.CONFIRMED);
+                try {
+                    paymentRepository.save(payment);
+                } catch (Exception e) {
                     sendRefundRequest(payment);
                     return;
                 }
-
-                payment.setStatus(PaymentStatus.CONFIRMED);
-                paymentRepository.save(payment);
                 logger.info("Payment Approved for ID: {}", payment.getPaymentId());
 
                 Message<String> successMsg = MessageBuilder
@@ -89,7 +74,11 @@ public class PaymentService {
             }
         } catch (PaymentFault_Exception e) {
             payment.setStatus(PaymentStatus.CANCELLED);
-            paymentRepository.save(payment);
+            try {
+                paymentRepository.save(payment);
+            } catch (Exception ex) {
+                return;
+            }
             logger.error("SOAP Service returned a fault: {}", e.getFaultInfo().getMessage());
 
             Message<String> errorMsg = MessageBuilder
@@ -130,7 +119,11 @@ public class PaymentService {
                 Payment payment = new Payment();
                 payment.setPaymentId(key);
                 payment.setStatus(PaymentStatus.CANCELLED);
-                paymentRepository.save(payment);
+                try {
+                    paymentRepository.save(payment);
+                } catch (Exception ex) {
+                    handleSaga(source, key);
+                }
             }
         }
     }

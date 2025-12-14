@@ -47,7 +47,14 @@ public class ReservationService {
         if (reservation.getStatus().equals(ReservationStatus.PENDING)) {
             if (source.equals("RESERVATION")) reservation.setStatus(ReservationStatus.CONFIRMED_RESERVATION);
             if (source.equals("PAYMENT")) reservation.setStatus(ReservationStatus.CONFIRMED_PAYMENT);
-            reservation.setMessage(message);
+
+            if (reservation.getUpdateMessages() == null) {
+                reservation.setUpdateMessages(message);
+            } else {
+                reservation.setUpdateMessages(String.join(";", reservation.getUpdateMessages(), message));
+
+            }
+            reservation.setUpdateMessages(message);
             reservationRepository.save(reservation);
         } else if (reservation.getStatus().equals(ReservationStatus.CONFIRMED_RESERVATION) || reservation.getStatus().equals(ReservationStatus.CONFIRMED_PAYMENT)) {
             reservation.setStatus(ReservationStatus.CONFIRMED_ALL);
@@ -62,7 +69,11 @@ public class ReservationService {
         assert reservation != null;
 
         reservation.setStatus(ReservationStatus.CANCELLED);
-        reservation.setMessage(message);
+        if (reservation.getErrorMessages() == null) {
+            reservation.setErrorMessages(message);
+        } else {
+            reservation.setErrorMessages(String.join(";", reservation.getErrorMessages(), message));
+        }
         reservationRepository.save(reservation);
     }
 }
