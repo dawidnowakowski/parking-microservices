@@ -25,7 +25,15 @@ public class ReservationService {
 
     @Transactional
     public void save(Reservation reservation) {
+        try {
+            reservationRepository.save(reservation);
+        } catch (Exception e) {
+            // if an exception is thrown by JPA it means that the record already exists - which is only true if the record was created by Saga
+            return;
+        }
+
         boolean isTaken = reservationRepository.existsOverlappingReservation(
+                reservation.getReservationId(),
                 reservation.getParkingSpotId(),
                 reservation.getStartDate(),
                 reservation.getEndDate()
@@ -41,7 +49,8 @@ public class ReservationService {
                     .withPayload("Parking spot already taken")
                     .setHeader(KafkaHeaders.TOPIC, TOPIC_STATUS)
                     .setHeader(KafkaHeaders.KEY, reservation.getReservationId())
-                    .setHeader("event-type", "error")
+                    .setHeader("source", "RESERVATION")
+                    .setHeader("event-type", "1")
                     .build();
             kafkaTemplate.send(errorMsg);
 
@@ -53,6 +62,7 @@ public class ReservationService {
                     .build();
             kafkaTemplate.send(sagaMsg);
         } else {
+            reservation.setStatus(ReservationStatus.RESERVED);
             reservationRepository.save(reservation);
 
             logger.info("ReservationId: {} successful - spot is now reserved", reservation.getReservationId());
@@ -61,15 +71,16 @@ public class ReservationService {
                     .withPayload("Successfully reserved parking spot")
                     .setHeader(KafkaHeaders.TOPIC, TOPIC_STATUS)
                     .setHeader(KafkaHeaders.KEY, reservation.getReservationId())
-                    .setHeader("event-type", "update")
+                    .setHeader("source", "RESERVATION")
+                    .setHeader("event-type", "0")
                     .build();
             kafkaTemplate.send(successMsg);
         }
     }
 
-
+    @Transactional
     public void handleSaga(String source, String key) {
-        if (!source.equals("RESERVATION")) {
+        if (!source.equals("RESERVATION")) { // if source is the same as target then record is already cancelled. If not then it may be that record was either created or not
             reservationRepository.findById(key).ifPresentOrElse(
                     reservation -> reservation.setStatus(ReservationStatus.CANCELLED),
                     () -> {

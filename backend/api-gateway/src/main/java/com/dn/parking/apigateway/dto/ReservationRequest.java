@@ -7,7 +7,7 @@ import org.hibernate.validator.constraints.Range;
 import java.time.LocalDateTime;
 
 @Data
-public class ReservationDTO {
+public class ReservationRequest {
     @NotBlank(message = "missing email")
     @Email(message = "email is not properly formatted")
     private String email;

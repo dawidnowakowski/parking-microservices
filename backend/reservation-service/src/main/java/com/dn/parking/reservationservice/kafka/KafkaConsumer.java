@@ -27,7 +27,7 @@ public class KafkaConsumer {
             @Header(KafkaHeaders.RECEIVED_KEY) String key) {
         logger.info("Reservation request received from Kafka topic: {} with key: {}", TOPIC_REQUESTS, key);
         message.setReservationId(key);
-        message.setStatus(ReservationStatus.RESERVED);
+        message.setStatus(ReservationStatus.IN_PROGRESS);
         reservationService.save(message);
     }
 
