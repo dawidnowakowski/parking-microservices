@@ -47,17 +47,11 @@ public class ReservationService {
         if (reservation.getStatus().equals(ReservationStatus.PENDING)) {
             if (source.equals("RESERVATION")) reservation.setStatus(ReservationStatus.CONFIRMED_RESERVATION);
             if (source.equals("PAYMENT")) reservation.setStatus(ReservationStatus.CONFIRMED_PAYMENT);
-
-            if (reservation.getUpdateMessages() == null) {
-                reservation.setUpdateMessages(message);
-            } else {
-                reservation.setUpdateMessages(String.join(";", reservation.getUpdateMessages(), message));
-
-            }
             reservation.setUpdateMessages(message);
             reservationRepository.save(reservation);
         } else if (reservation.getStatus().equals(ReservationStatus.CONFIRMED_RESERVATION) || reservation.getStatus().equals(ReservationStatus.CONFIRMED_PAYMENT)) {
             reservation.setStatus(ReservationStatus.CONFIRMED_ALL);
+            reservation.setUpdateMessages(String.join(";", reservation.getUpdateMessages(), message));
             reservationRepository.save(reservation);
         }
 
