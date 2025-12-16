@@ -7,10 +7,10 @@ Content-Type: application/json
   "startDate": "2026-10-18T07:43",
   "endDate": "2026-10-18T07:44",
   "registrationNumber": "CBY12345",
-  "parkingSpotId": "U14234",
-  "cardNumber": "2123-456-789",
+  "parkingSpotId": "U145",
+  "cardNumber": "1123-456-789",
   "cvv": 100
 }
 
 ###
-GET http://localhost:8080/api/reservation/3
+GET http://localhost:8080/api/reservation/aaf11dae-859d-43c9-8fa6-c6b0680772e9

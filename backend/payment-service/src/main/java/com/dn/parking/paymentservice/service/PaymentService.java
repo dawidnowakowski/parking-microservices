@@ -112,14 +112,19 @@ public class PaymentService {
                 } else if (paymentOpt.get().getStatus().equals(PaymentStatus.PENDING)) {
                     paymentOpt.get().setStatus(PaymentStatus.CANCELLED);
                     paymentRepository.save(paymentOpt.get());
-                } // another else-if would be CANCELLED but in this case we don't have to change anything
+                    // dont send refund request because it means that there is another thread waiting for soap response and it will call the method after receiving soap response
+                }
+                // another else-if would be CANCELLED but in this case we don't have to change anything
             } else {
                 Payment payment = new Payment();
                 payment.setPaymentId(key);
                 payment.setStatus(PaymentStatus.CANCELLED);
                 try {
                     paymentRepository.save(payment);
+                    logger.info("Payment not yet registered - not sending refund for: {}", key);
+                    // not sending refund because the payment hasn't started and when it starts it will see the canceled state adn return
                 } catch (Exception ex) {
+                    // version has changed -> record was created in the meantime
                     handleSaga(source, key);
                 }
             }
