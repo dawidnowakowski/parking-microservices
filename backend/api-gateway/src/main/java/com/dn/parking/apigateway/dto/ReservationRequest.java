@@ -21,7 +21,7 @@ public class ReservationRequest {
     private LocalDateTime endDate;
 
     @NotNull(message = "registrationNumber is missing")
-    @Size(message = "registrationNumber must be 4 to 8 characters long")
+    @Size(message = "registrationNumber must be 4 to 8 characters long", min = 4, max = 8)
     private String registrationNumber;
 
     @NotBlank(message = "parkingSpotId is missing")

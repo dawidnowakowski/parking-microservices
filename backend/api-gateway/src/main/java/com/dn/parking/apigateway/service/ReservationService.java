@@ -2,17 +2,15 @@ package com.dn.parking.apigateway.service;
 
 import com.dn.parking.apigateway.dto.ReservationRequest;
 import com.dn.parking.apigateway.exception.InvalidReservationDateException;
+import com.dn.parking.apigateway.exception.NotFoundException;
 import com.dn.parking.apigateway.model.Reservation;
 import com.dn.parking.apigateway.model.ReservationStatus;
 import com.dn.parking.apigateway.repository.ReservationRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -36,9 +34,9 @@ public class ReservationService {
         return reservationId;
     }
 
-    public Reservation getReservation(String key) throws HttpClientErrorException.NotFound {
+    public Reservation getReservation(String key) throws NotFoundException {
         return reservationRepository.findById(key)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Reservation not found with id: " + key));
+                .orElseThrow(() -> new NotFoundException("Reservation not found with id: " + key));
     }
 
     public void handleSuccessMessage(String key, String source, String message) {
