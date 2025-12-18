@@ -79,7 +79,7 @@ public class PaymentService {
                         .setHeader("event-type", "0")
                         .build();
                 kafkaTemplate.send(successMsg);
-            }
+            } // else = catch
         } catch (PaymentFault_Exception e) {
             logger.error("SOAP Service returned a fault: {}", e.getFaultInfo().getMessage());
             payment.setStatus(PaymentStatus.CANCELLED);

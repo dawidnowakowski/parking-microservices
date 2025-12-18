@@ -64,6 +64,7 @@ public class ReservationService {
                 reservationRepository.save(reservation);
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
+                return;
             }
 
             logger.info("ReservationId: {} successful - spot is now reserved", reservation.getReservationId());
