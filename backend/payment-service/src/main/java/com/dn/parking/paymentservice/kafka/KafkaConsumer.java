@@ -43,6 +43,7 @@ public class KafkaConsumer {
     public void processSagaMessage(
             @Header("source") String source,
             @Header(KafkaHeaders.RECEIVED_KEY) String key) {
+        logger.info("Received Saga for key: {}", key);
         paymentService.handleSaga(source, key);
     }
 }

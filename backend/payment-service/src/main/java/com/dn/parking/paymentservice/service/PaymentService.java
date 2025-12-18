@@ -48,17 +48,28 @@ public class PaymentService {
         soapRequest.setCardNumber(payment.getCardNumber());
         soapRequest.setCvv(payment.getCvv().toString());
 
+        // save with PENDING status
+        if (paymentRepository.findById(payment.getPaymentId()).isPresent()) {
+            logger.info("Payment request already exists for key: {}", payment.getPaymentId());
+            return;
+        } else {
+            paymentRepository.save(payment);
+            logger.info("Payment request saved for key: {}", payment.getPaymentId());
+        }
+
         try {
             PaymentResponse soapResponse = port.processPayment(soapRequest);
             if (soapResponse.isApproved()) {
+                logger.info("Payment Approved for ID: {}", payment.getPaymentId());
                 payment.setStatus(PaymentStatus.CONFIRMED);
                 try {
                     paymentRepository.save(payment);
+                    logger.info("Record created for key: {}", payment.getPaymentId());
                 } catch (Exception e) {
+                    logger.error("Record was canceled during SOAP request for key: {}. Sending refund request", payment.getPaymentId());
                     sendRefundRequest(payment);
                     return;
                 }
-                logger.info("Payment Approved for ID: {}", payment.getPaymentId());
 
                 Message<String> successMsg = MessageBuilder
                         .withPayload("Payment approved")
@@ -70,13 +81,14 @@ public class PaymentService {
                 kafkaTemplate.send(successMsg);
             }
         } catch (PaymentFault_Exception e) {
+            logger.error("SOAP Service returned a fault: {}", e.getFaultInfo().getMessage());
             payment.setStatus(PaymentStatus.CANCELLED);
             try {
+                logger.info("Creating a record (canceled) for key: {}", payment.getPaymentId());
                 paymentRepository.save(payment);
             } catch (Exception ex) {
-                return;
+                logger.error("Record was canceled during SOAP request for key: {}", payment.getPaymentId());
             }
-            logger.error("SOAP Service returned a fault: {}", e.getFaultInfo().getMessage());
 
             Message<String> errorMsg = MessageBuilder
                     .withPayload("Payment rejected by bank")
@@ -94,25 +106,28 @@ public class PaymentService {
                     .setHeader("source", "PAYMENT")
                     .build();
             kafkaTemplate.send(sagaMsg);
-
-            sendRefundRequest(payment);
         }
     }
 
     public void handleSaga(String source, String key) {
-        logger.info("Received Saga for key: {}", key);
         if (!source.equals("PAYMENT")) {
             Optional<Payment> paymentOpt = paymentRepository.findById(key);
 
             if (paymentOpt.isPresent()) {
+                logger.info("Payment request already exists for key: {}", key);
                 if (paymentOpt.get().getStatus().equals(PaymentStatus.CONFIRMED)) {
                     paymentOpt.get().setStatus(PaymentStatus.CANCELLED);
                     paymentRepository.save(paymentOpt.get());
                     sendRefundRequest(paymentOpt.get());
                 } else if (paymentOpt.get().getStatus().equals(PaymentStatus.PENDING)) {
                     paymentOpt.get().setStatus(PaymentStatus.CANCELLED);
-                    paymentRepository.save(paymentOpt.get());
-                    // dont send refund request because it means that there is another thread waiting for soap response and it will call the method after receiving soap response
+                    try {
+                        paymentRepository.save(paymentOpt.get());
+                    } catch (Exception ex) {
+                        // in the meantime record was created
+                        handleSaga(source, key);
+                    }
+                    // don't send refund request because it means that there is another thread waiting for soap response and it will call the method after receiving soap response
                 }
                 // another else-if would be CANCELLED but in this case we don't have to change anything
             } else {
@@ -124,7 +139,7 @@ public class PaymentService {
                     logger.info("Payment not yet registered - not sending refund for: {}", key);
                     // not sending refund because the payment hasn't started and when it starts it will see the canceled state adn return
                 } catch (Exception ex) {
-                    // version has changed -> record was created in the meantime
+                    // version has changed -> record was created in the meantime by processing
                     handleSaga(source, key);
                 }
             }
@@ -145,12 +160,16 @@ public class PaymentService {
             RefundResponse soapResponse = port.processRefund(soapRequest);
             logger.info("Refund Response for transaction {}", payment.getPaymentId());
             if (soapResponse.isSuccess()) {
-                payment.setStatus(PaymentStatus.REFUNDED);
-                paymentRepository.save(payment);
+                paymentRepository.findById(payment.getPaymentId()).ifPresent(p -> {
+                    p.setStatus(PaymentStatus.REFUNDED);
+                    paymentRepository.save(p);
+                });
             }
         } catch (Exception e) {
-            payment.setStatus(PaymentStatus.REFUND_ERROR);
-            paymentRepository.save(payment);
+            paymentRepository.findById(payment.getPaymentId()).ifPresent(p -> {
+                p.setStatus(PaymentStatus.REFUND_ERROR);
+                paymentRepository.save(p);
+            });
         }
     }
 }
