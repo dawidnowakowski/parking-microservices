@@ -1,6 +1,7 @@
 package com.dn.parking.apigateway.controller;
 
 import com.dn.parking.apigateway.dto.ReservationRequest;
+import com.dn.parking.apigateway.dto.ValidationResponse;
 import com.dn.parking.apigateway.model.Reservation;
 import com.dn.parking.apigateway.service.ReservationService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,6 +25,23 @@ public class ReservationController {
         this.reservationService = reservationService;
     }
 
+    @Operation(
+            summary = "Send reservation request",
+            description = "Sends a reservation requests, responds with a reservation id if data is valid",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "202",
+                            description = "ACCEPTED",
+                            content = @Content(schema = @Schema(implementation = String.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "VALIDATION FAILED",
+                            content = @Content(schema = @Schema(implementation = ValidationResponse.class, example = "{\"cvv\": \"cvv must be in range 100-999\", \"startDate\": \"startDate must be in the future\"}"))
+
+                    )
+            }
+    )
     @PostMapping("/reservation")
     public ResponseEntity<String> createReservation(@RequestBody @Valid ReservationRequest reservationDto) {
         String reservationId = reservationService.createReservation(reservationDto);
