@@ -3,6 +3,7 @@ package com.dn.parking.paymentservice.service;
 import com.dn.parking.paymentservice.model.Payment;
 import com.dn.parking.paymentservice.model.PaymentStatus;
 import com.dn.parking.paymentservice.repository.PaymentRepository;
+import jakarta.xml.ws.BindingProvider;
 import lab.paymentsoapservice.*;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -26,6 +27,7 @@ public class PaymentService {
     private final String TOPIC_SAGA = "saga-alert";
     private final KafkaTemplate<String, String> kafkaTemplate;
 
+    private static final String SOAP_ENDPOINT_URL = "http://soap-payment-service:8083/soap-api/service/payment";
     private static final QName SERVICE_NAME = new QName("http://paymentsoapservice.lab/", "PaymentService");
     Logger logger = LoggerFactory.getLogger(PaymentService.class);
 
@@ -38,10 +40,16 @@ public class PaymentService {
     }
 
     public void sendPaymentRequest(Payment payment) {
-        URL wsdlURL = PaymentService_Service.WSDL_LOCATION;
+        URL wsdlURL = getClass().getClassLoader().getResource("payment.wsdl");
+        if (wsdlURL == null) {
+            throw new RuntimeException("Could not find payment.wsdl");
+        }
 
         PaymentService_Service ss = new PaymentService_Service(wsdlURL, SERVICE_NAME);
         lab.paymentsoapservice.PaymentService port = ss.getPaymentServicePort();
+
+        BindingProvider bp = (BindingProvider) port;
+        bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, SOAP_ENDPOINT_URL);
 
         PaymentRequest soapRequest = new PaymentRequest();
         soapRequest.setAmount(payment.getAmount());
@@ -148,11 +156,16 @@ public class PaymentService {
 
     public void sendRefundRequest(Payment payment) {
         logger.info("Sending Refund Request for transaction {}", payment.getPaymentId());
-        URL wsdlURL = PaymentService_Service.WSDL_LOCATION;
+        URL wsdlURL = getClass().getClassLoader().getResource("payment.wsdl");
+        if (wsdlURL == null) {
+            throw new RuntimeException("Could not find payment.wsdl");
+        }
 
         PaymentService_Service ss = new PaymentService_Service(wsdlURL, SERVICE_NAME);
         lab.paymentsoapservice.PaymentService port = ss.getPaymentServicePort();
 
+        BindingProvider bp = (BindingProvider) port;
+        bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, SOAP_ENDPOINT_URL);
         RefundRequest soapRequest = new RefundRequest();
         soapRequest.setTransactionId(payment.getPaymentId());
 

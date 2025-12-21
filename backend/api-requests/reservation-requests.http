@@ -4,13 +4,13 @@ Content-Type: application/json
 
 {
   "email": "test@test.com",
-  "startDate": "2026-10-18T07:43",
-  "endDate": "2026-10-18T07:44",
+  "startDate": "2026-10-18T12:00",
+  "endDate": "2026-10-18T14:00",
   "registrationNumber": "CBY12345",
   "parkingSpotId": "U145",
-  "cardNumber": "1123-456-789",
+  "cardNumber": "123-456-789",
   "cvv": 100
 }
 
 ###
-GET http://localhost:8080/api/reservation/aaf11dae-859d-43c9-8fa6-c6b0680772e9
+GET http://localhost:8080/api/reservation/9f0b45b1-385c-47d2-8955-24215155c585
