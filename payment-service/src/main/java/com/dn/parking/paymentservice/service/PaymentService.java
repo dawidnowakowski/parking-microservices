@@ -27,7 +27,8 @@ public class PaymentService {
     private final String TOPIC_SAGA = "saga-alert";
     private final KafkaTemplate<String, String> kafkaTemplate;
 
-    private static final String SOAP_ENDPOINT_URL = "http://soap-payment-service:8083/soap-api/service/payment";
+    @org.springframework.beans.factory.annotation.Value("${payment.soap.url}")
+    private String SOAP_ENDPOINT_URL;
     private static final QName SERVICE_NAME = new QName("http://paymentsoapservice.lab/", "PaymentService");
     Logger logger = LoggerFactory.getLogger(PaymentService.class);
 
