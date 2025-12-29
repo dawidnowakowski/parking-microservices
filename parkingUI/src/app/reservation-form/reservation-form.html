@@ -1,0 +1,25 @@
+<form class="reservation-form" [formGroup]="reservationForm" (ngSubmit)="onSubmit()">
+  <label for="email">Email: </label>
+  <input id="email" type="text" formControlName="email">
+
+  <label for="startDate">Start date: </label>
+  <input id="startDate" type="datetime-local" formControlName="startDate">
+
+  <label for="endDate">End date: </label>
+  <input id="endDate" type="datetime-local" formControlName="endDate">
+
+  <label for="registrationNumber">Registration number: </label>
+  <input id="registrationNumber" type="text" formControlName="registrationNumber">
+
+  <label for="parkingSpotId">Parking spot number: </label>
+  <input id="parkingSpotId" type="text" formControlName="parkingSpotId">
+
+  <label for="cardNumber">Card number: </label>
+  <input id="cardNumber" type="text" formControlName="cardNumber">
+
+  <label for="cvv">cvv: </label>
+  <input id="cvv" type="number" formControlName="cvv">
+
+  <p>Send reservation request.</p>
+  <button type="submit" [disabled]="!reservationForm.valid">Submit</button>
+</form>

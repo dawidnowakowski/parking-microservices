@@ -1,12 +1,13 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import {Component} from '@angular/core';
+import {ReservationForm} from './reservation-form/reservation-form';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
   templateUrl: './app.html',
+  imports: [
+    ReservationForm
+  ],
   styleUrl: './app.css'
 })
 export class App {
-  protected readonly title = signal('parkingUI');
 }
