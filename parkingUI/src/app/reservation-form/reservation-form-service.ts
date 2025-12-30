@@ -1,5 +1,5 @@
 import {inject, Injectable} from '@angular/core';
-import {ReservationRequest} from './models';
+import {ReservationRequest} from './reservation-request';
 import {HttpClient} from '@angular/common/http';
 
 @Injectable({

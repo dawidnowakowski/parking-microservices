@@ -1,4 +1,4 @@
-import {Component, inject} from '@angular/core';
+import {Component, inject, output} from '@angular/core';
 import {
   AbstractControl,
   FormControl,
@@ -9,7 +9,7 @@ import {
   Validators
 } from '@angular/forms';
 import {ReservationFormService} from './reservation-form-service';
-import {ReservationRequest} from './models';
+import {ReservationRequest} from './reservation-request';
 
 @Component({
   selector: 'app-reservation-form',
@@ -21,6 +21,7 @@ import {ReservationRequest} from './models';
 })
 export class ReservationForm {
   private reservationService = inject(ReservationFormService);
+  reservationCreated = output<string>();
 
   reservationForm = new FormGroup({
     email: new FormControl('test@test.com', [Validators.required, Validators.email]),
@@ -46,7 +47,7 @@ export class ReservationForm {
 
     const reservationDto = this.mapToDto(this.reservationForm.value);
     this.reservationService.sendReservationRequest(reservationDto).subscribe({
-      next: value => console.log(value),
+      next: value => this.reservationCreated.emit(value),
       error: err => console.error(err)
     })
   }
