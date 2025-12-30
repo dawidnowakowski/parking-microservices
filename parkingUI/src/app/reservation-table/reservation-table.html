@@ -1,0 +1,33 @@
+<h3>Reservations</h3>
+
+<table>
+  <thead>
+  <tr>
+    <th>ID</th>
+    <th>Status</th>
+    <th>Details</th>
+  </tr>
+  </thead>
+  <tbody>
+    @for (res of reservations(); track res.id) {
+      <tr>
+        <td>{{ res.id }}</td>
+        <td>{{ res.status }}</td>
+        <td>
+          <small>{{ res.updateMessages }}</small>
+          @if (res.errorMessages) {
+            <div style="color: red">
+              {{ res.errorMessages }}
+            </div>
+          }
+        </td>
+      </tr>
+    }
+  </tbody>
+</table>
+
+@if (reservations().length === 0) {
+  <div>
+    <p>No reservations to track yet.</p>
+  </div>
+}
