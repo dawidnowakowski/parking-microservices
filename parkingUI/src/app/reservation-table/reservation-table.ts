@@ -34,7 +34,7 @@ export class ReservationTable {
         try {
           const requests = idsToFetch.map(id =>
             firstValueFrom(
-              this.http.get<ReservationResponse>(`http://localhost:8080/api/reservation/${id}`)
+              this.http.get<ReservationResponse>(`/api/reservation/${id}`)
             )
           );
 

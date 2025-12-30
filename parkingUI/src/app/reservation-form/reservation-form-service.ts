@@ -9,6 +9,6 @@ export class ReservationFormService {
   private http = inject(HttpClient)
 
   public sendReservationRequest(dto: ReservationRequest) {
-    return this.http.post('http://localhost:8080/api/reservation', dto, {responseType: 'text'})
+    return this.http.post('/api/reservation', dto, {responseType: 'text'})
   }
 }

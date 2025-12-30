@@ -69,3 +69,10 @@ services:
     depends_on:
       - kafka
       - soap-payment-service
+
+  payment-ui:
+    build: ./parkingUI
+    ports:
+      - "4200:8080"
+    depends_on:
+      - api-gateway

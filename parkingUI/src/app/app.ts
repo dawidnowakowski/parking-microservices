@@ -15,7 +15,6 @@ export class App {
   ids = signal<string[]>([]);
 
   protected onReservationCreated(newId: string) {
-    debugger
     this.ids.update(current => [...current, newId]);
   }
 }
