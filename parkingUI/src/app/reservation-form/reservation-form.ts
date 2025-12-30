@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {
   AbstractControl,
   FormControl,
@@ -8,6 +8,8 @@ import {
   ValidatorFn,
   Validators
 } from '@angular/forms';
+import {ReservationFormService} from './reservation-form-service';
+import {ReservationRequest} from './models';
 
 @Component({
   selector: 'app-reservation-form',
@@ -18,6 +20,8 @@ import {
   styleUrl: './reservation-form.css',
 })
 export class ReservationForm {
+  private reservationService = inject(ReservationFormService);
+
   reservationForm = new FormGroup({
     email: new FormControl('test@test.com', [Validators.required, Validators.email]),
     startDate: new FormControl('2026-10-12T12:15', [Validators.required, futureDateValidator()]),
@@ -40,7 +44,24 @@ export class ReservationForm {
       return
     }
 
-    console.warn(this.reservationForm)
+    const reservationDto = this.mapToDto(this.reservationForm.value);
+    this.reservationService.sendReservationRequest(reservationDto).subscribe({
+      next: value => console.log(value),
+      error: err => console.error(err)
+    })
+  }
+
+
+  private mapToDto(formValue: any): ReservationRequest {
+    return {
+      email: formValue.email,
+      startDate: formValue.startDate,
+      endDate: formValue.endDate,
+      registrationNumber: formValue.registrationNumber,
+      parkingSpotId: formValue.parkingSpotId,
+      cardNumber: formValue.cardNumber,
+      cvv: formValue.cvv
+    };
   }
 }
 

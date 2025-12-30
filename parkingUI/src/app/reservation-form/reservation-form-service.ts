@@ -1,9 +1,14 @@
-import {Injectable} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
+import {ReservationRequest} from './models';
+import {HttpClient} from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ReservationFormService {
-  protected sendReservationRequest() {
+  private http = inject(HttpClient)
+
+  public sendReservationRequest(dto: ReservationRequest) {
+    return this.http.post('http://localhost:8080/api/reservation', dto, {responseType: 'text'})
   }
 }

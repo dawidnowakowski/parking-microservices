@@ -1,7 +1,7 @@
 export interface ReservationRequest {
   email: string,
-  startDate: Date,
-  endDate: Date,
+  startDate: string,
+  endDate: string,
   registrationNumber: string,
   parkingSpotId: string,
   cardNumber: string,
