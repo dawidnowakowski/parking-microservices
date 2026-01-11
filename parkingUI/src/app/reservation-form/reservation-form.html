@@ -1,25 +1,83 @@
-<form class="reservation-form" [formGroup]="reservationForm" (ngSubmit)="onSubmit()">
-  <label for="email">Email: </label>
-  <input id="email" type="text" formControlName="email">
+<div class="form-container">
+  <h2>Create Reservation</h2>
+  <form class="reservation-form" [formGroup]="reservationForm" (ngSubmit)="onSubmit()">
 
-  <label for="startDate">Start date: </label>
-  <input id="startDate" type="datetime-local" formControlName="startDate">
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input id="email" type="text" formControlName="email" placeholder="user@example.com">
+      @if (reservationForm.get('email')?.invalid && reservationForm.get('email')?.touched) {
+        <div class="error-message">
+          @if (reservationForm.get('email')?.hasError('required')) { Email is required. }
+          @if (reservationForm.get('email')?.hasError('email')) { Please enter a valid email. }
+        </div>
+      }
+    </div>
 
-  <label for="endDate">End date: </label>
-  <input id="endDate" type="datetime-local" formControlName="endDate">
+    <div class="row">
+      <div class="form-group half-width">
+        <label for="startDate">Start date</label>
+        <input id="startDate" type="datetime-local" formControlName="startDate">
+        @if (reservationForm.get('startDate')?.invalid && reservationForm.get('startDate')?.touched) {
+          <div class="error-message">
+            @if (reservationForm.get('startDate')?.hasError('required')) { Start date is required. }
+            @if (reservationForm.get('startDate')?.hasError('dateInThePast')) { Date must be in the future. }
+          </div>
+        }
+      </div>
 
-  <label for="registrationNumber">Registration number: </label>
-  <input id="registrationNumber" type="text" formControlName="registrationNumber">
+      <div class="form-group half-width">
+        <label for="endDate">End date</label>
+        <input id="endDate" type="datetime-local" formControlName="endDate">
+        @if (reservationForm.get('endDate')?.invalid && reservationForm.get('endDate')?.touched) {
+          <div class="error-message">
+            @if (reservationForm.get('endDate')?.hasError('required')) { End date is required. }
+            @if (reservationForm.get('endDate')?.hasError('dateInThePast')) { Date must be in the future. }
+          </div>
+        }
+      </div>
+    </div>
 
-  <label for="parkingSpotId">Parking spot number: </label>
-  <input id="parkingSpotId" type="text" formControlName="parkingSpotId">
+    <div class="row">
+      <div class="form-group half-width">
+        <label for="registrationNumber">Registration number</label>
+        <input id="registrationNumber" type="text" formControlName="registrationNumber" placeholder="e.g. POZ99999">
+        @if (reservationForm.get('registrationNumber')?.invalid && reservationForm.get('registrationNumber')?.touched) {
+          <div class="error-message">Registration number is required.</div>
+        }
+      </div>
 
-  <label for="cardNumber">Card number: </label>
-  <input id="cardNumber" type="text" formControlName="cardNumber">
+      <div class="form-group half-width">
+        <label for="parkingSpotId">Parking spot number</label>
+        <input id="parkingSpotId" type="text" formControlName="parkingSpotId" placeholder="e.g. U145">
+        @if (reservationForm.get('parkingSpotId')?.invalid && reservationForm.get('parkingSpotId')?.touched) {
+          <div class="error-message">Spot number is required.</div>
+        }
+      </div>
+    </div>
 
-  <label for="cvv">cvv: </label>
-  <input id="cvv" type="number" formControlName="cvv">
+    <div class="form-group">
+      <label for="cardNumber">Card number</label>
+      <input id="cardNumber" type="text" formControlName="cardNumber" placeholder="000-000-000">
+      @if (reservationForm.get('cardNumber')?.invalid && reservationForm.get('cardNumber')?.touched) {
+        <div class="error-message">
+          @if (reservationForm.get('cardNumber')?.hasError('required')) { Card number is required. }
+          @if (reservationForm.get('cardNumber')?.hasError('pattern')) { Format must be 000-000-000. }
+        </div>
+      }
+    </div>
 
-  <p>Send reservation request.</p>
-  <button type="submit" [disabled]="!reservationForm.valid">Submit</button>
-</form>
+    <div class="form-group">
+      <label for="cvv">CVV</label>
+      <input id="cvv" type="number" formControlName="cvv" placeholder="123">
+      @if (reservationForm.get('cvv')?.invalid && reservationForm.get('cvv')?.touched) {
+        <div class="error-message">
+          @if (reservationForm.get('cvv')?.hasError('required')) { CVV is required. }
+          @if (reservationForm.get('cvv')?.hasError('min') || reservationForm.get('cvv')?.hasError('max')) { CVV must be 3 digits. }
+        </div>
+      }
+    </div>
+
+    <p class="info-text">Send reservation request to proceed.</p>
+    <button type="submit" [disabled]="!reservationForm.valid" [class.disabled-btn]="!reservationForm.valid">Submit Reservation</button>
+  </form>
+</div>
